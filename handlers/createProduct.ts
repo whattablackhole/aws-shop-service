@@ -2,7 +2,7 @@ import { APIGatewayEvent } from "aws-lambda";
 import { lambdaHandlerWrapper } from "../helpers/lambda-handler-wrapper";
 import { validateBySchema } from "../helpers/validators";
 import { ApiError } from "../infrastructure/api-error";
-import productPayloadSchema from "../schemas/productSchema";
+import productPayloadSchema from "../infrastructure/schemas/productSchema";
 import productService from "../services/products.service";
 
 export const createProduct = lambdaHandlerWrapper(
