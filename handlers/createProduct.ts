@@ -14,7 +14,16 @@ export const createProduct = lambdaHandlerWrapper(
         "Invalid object payload type!"
       );
     }
-    const newProduct = JSON.parse(event.body);
+    let newProduct;
+    try {
+      newProduct = JSON.parse(event.body);
+    } catch (err) {
+      throw new ApiError(
+        "ValidationError",
+        400,
+        "Invalid object payload type!"
+      );
+    }
     const isValidProductInfo = validateBySchema(
       newProduct,
       productPayloadSchema
