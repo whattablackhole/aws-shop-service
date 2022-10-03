@@ -1,11 +1,11 @@
 import { APIGatewayEvent, APIGatewayProxyHandler } from "aws-lambda";
-import { errorHandleWrapper } from "../errorHandleWrapper";
+import { lambdaHandlerWrapper } from "../helpers/lambda-handler-wrapper";
 import productService from "../services/products.service";
 
-export const getProductById = errorHandleWrapper(async function (
+export const getProductById = lambdaHandlerWrapper(async function (
   event: APIGatewayEvent
 ) {
-  const productId = event.pathParameters["id"];
+  const productId = event.pathParameters?.["id"];
 
   if (!productId) {
     throw new Error("Bad request id!");
@@ -19,6 +19,6 @@ export const getProductById = errorHandleWrapper(async function (
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Credentials": true,
     },
-    body: JSON.stringify(product),
+    body: JSON.stringify(product, null, 2),
   };
 }) as APIGatewayProxyHandler;
