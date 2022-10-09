@@ -1,4 +1,4 @@
-service: aws-shop-service
+service: product-service
 
 frameworkVersion: '3'
 
