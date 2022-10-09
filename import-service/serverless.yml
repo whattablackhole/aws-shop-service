@@ -1,0 +1,47 @@
+service: import-service
+
+frameworkVersion: '3'
+
+plugins:
+  - serverless-webpack
+  
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: eu-west-1
+  environment:
+    bucketName: wbh-imports
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "s3:*"
+      Resource:
+        - "arn:aws:s3:::wbh-imports/*"
+functions:
+  getProductsList:
+    handler: handler.importProductsFile
+    events:
+      - http:
+          path: import
+          method: get
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+          request:
+            parameters:
+              querystrings:
+                name: true
+  importFileParser:
+    handler: handler.importFileParser
+    events:
+      - s3:
+          bucket: wbh-imports
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: uploaded/
+          existing: true
