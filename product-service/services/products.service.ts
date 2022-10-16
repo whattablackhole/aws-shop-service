@@ -6,10 +6,10 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { ApiError } from "../infrastructure/api-error";
 
-const dynamoDb = new AWS.DynamoDB.DocumentClient();
-
 const productService = {
   getProductData: async () => {
+    const dynamoDb = new AWS.DynamoDB.DocumentClient();
+
     const products = await dynamoDb
       .scan({
         TableName: "Products",
@@ -31,6 +31,7 @@ const productService = {
     return Promise.resolve(products.Items);
   },
   getProductDataById: async (id: string) => {
+    const dynamoDb = new AWS.DynamoDB.DocumentClient();
     return dynamoDb
       .get({
         TableName: "Products",
@@ -59,6 +60,7 @@ const productService = {
   },
 
   uploadProduct: async (productPayload: ProductTableItem) => {
+    const dynamoDb = new AWS.DynamoDB.DocumentClient();
     const result = await dynamoDb
       .put({
         TableName: "Products",

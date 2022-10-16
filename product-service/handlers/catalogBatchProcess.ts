@@ -6,13 +6,11 @@ import { ProductTableItem } from "../infrastructure/interfaces/db-data";
 import productPayloadSchema from "../infrastructure/schemas/productSchema";
 import productService from "../services/products.service";
 
-const snsClient = new sns({ region: "eu-west-1" });
-
 export const catalogBatchProcess = lambdaHandlerWrapper(async function (
-  event: any,
-  context: any,
-  callback: any
+  event: any
 ) {
+  const snsClient = new sns({ region: "eu-west-1" });
+
   const products: ProductTableItem[] = event.Records.map((r) => {
     const product = JSON.parse(r.body);
     return {
@@ -42,11 +40,11 @@ export const catalogBatchProcess = lambdaHandlerWrapper(async function (
     () => {}
   );
 
-  callback(null, {
+  return {
     statusCode: 200,
     headers: {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Credentials": true,
     },
-  });
+  };
 });
