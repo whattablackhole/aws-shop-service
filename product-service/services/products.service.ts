@@ -1,5 +1,8 @@
 import AWS from "aws-sdk";
-import { ProductTableItem, StocksTableItem } from "../infrastructure/interfaces/db-data";
+import {
+  ProductTableItem,
+  StocksTableItem,
+} from "../infrastructure/interfaces/db-data";
 import { v4 as uuidv4 } from "uuid";
 import { ApiError } from "../infrastructure/api-error";
 
@@ -55,7 +58,7 @@ const productService = {
       });
   },
 
-  uploadProduct: async (productPayload: object) => {
+  uploadProduct: async (productPayload: ProductTableItem) => {
     const result = await dynamoDb
       .put({
         TableName: "Products",
@@ -78,6 +81,11 @@ const productService = {
         500,
         result.$response.error.message ?? "unkown db error"
       );
+    }
+  },
+  uploadProducts: (products: ProductTableItem[]): void => {
+    for (let product of products) {
+      productService.uploadProduct(product);
     }
   },
 };

@@ -4,9 +4,10 @@ export interface StocksTableItem {
 }
 
 export interface ProductTableItem {
-    id: string;
+    id?: string;
     description: string;
     price: number;
     title: string;
+    count: number;
 }
 

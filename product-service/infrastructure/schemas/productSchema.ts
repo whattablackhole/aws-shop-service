@@ -5,8 +5,9 @@ const productPayloadSchema = {
     },
     price: { type: "number" },
     title: { type: "string" },
+    count: { type: "number" },
   },
-  required: ["title", "description", "price"],
+  required: ["title", "description", "price", "count"],
 };
 
 export default productPayloadSchema;

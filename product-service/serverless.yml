@@ -4,6 +4,7 @@ frameworkVersion: '3'
 
 plugins:
   - serverless-webpack
+  - serverless-iam-roles-per-function
 
 provider:
   name: aws
@@ -19,8 +20,53 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource: "*"
-  
+  environment:
+    SQS_URL:
+      Ref: SQSQueue
+    SNS_URL:
+      Ref: SNSTopic
+resources:
+  Resources:
+    SQSQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: products-sqs-queue
+        VisibilityTimeout: 100
+    SNSTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: createProductTopic
+    SNSSubcription:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Endpoint: PUT_YOU_EMAIL@gmail.com
+        Protocol: email
+        TopicArn:
+          Ref: SNSTopic
 functions:
+  catalogBatchProcess:
+    handler: handler.catalogBatchProcess
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - SQSQueue
+              - Arn
+          batchSize: 5
+    iamRoleStatements:
+      - Effect: "Allow"        
+        Action:
+          - sqs:*        
+        Resource:
+          Fn::GetAtt:
+              - SQSQueue
+              - Arn
+      - Effect: "Allow"        
+        Action:
+          - sns:*        
+        Resource:
+          Ref: SNSTopic
+    iamRoleStatementsInherit: true
   getProductsList:
     handler: handler.getProductsList
     events:
@@ -64,4 +110,4 @@ functions:
               - X-Api-Key
               - X-Amz-Security-Token
 
-  
+ 
