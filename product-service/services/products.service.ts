@@ -1,12 +1,15 @@
 import AWS from "aws-sdk";
-import { ProductTableItem, StocksTableItem } from "../infrastructure/interfaces/db-data";
+import {
+  ProductTableItem,
+  StocksTableItem,
+} from "../infrastructure/interfaces/db-data";
 import { v4 as uuidv4 } from "uuid";
 import { ApiError } from "../infrastructure/api-error";
 
-const dynamoDb = new AWS.DynamoDB.DocumentClient();
-
 const productService = {
   getProductData: async () => {
+    const dynamoDb = new AWS.DynamoDB.DocumentClient();
+
     const products = await dynamoDb
       .scan({
         TableName: "Products",
@@ -28,6 +31,7 @@ const productService = {
     return Promise.resolve(products.Items);
   },
   getProductDataById: async (id: string) => {
+    const dynamoDb = new AWS.DynamoDB.DocumentClient();
     return dynamoDb
       .get({
         TableName: "Products",
@@ -55,7 +59,8 @@ const productService = {
       });
   },
 
-  uploadProduct: async (productPayload: object) => {
+  uploadProduct: async (productPayload: ProductTableItem) => {
+    const dynamoDb = new AWS.DynamoDB.DocumentClient();
     const result = await dynamoDb
       .put({
         TableName: "Products",
@@ -78,6 +83,11 @@ const productService = {
         500,
         result.$response.error.message ?? "unkown db error"
       );
+    }
+  },
+  uploadProducts: (products: ProductTableItem[]): void => {
+    for (let product of products) {
+      productService.uploadProduct(product);
     }
   },
 };

@@ -1,7 +1,8 @@
-import { S3 } from "aws-sdk";
+import { S3, SQS } from "aws-sdk";
 const csv = require("csv-parser");
 
 const s3 = new S3({ region: "eu-west-1", signatureVersion: "v4" });
+const sqs = new SQS({ region: "eu-west-1" });
 
 export const importFileParser = async (request: any) => {
   const bucketName = request.Records[0].s3.bucket.name;
@@ -16,8 +17,15 @@ export const importFileParser = async (request: any) => {
       .createReadStream();
     readStream
       .pipe(csv())
-      .on("data", (data) => {
-        console.log(data);
+      .on("data", async (data) => {
+        sqs.sendMessage(
+          {
+            QueueUrl:
+              "https://sqs.eu-west-1.amazonaws.com/048768189929/products-sqs-queue",
+            MessageBody: JSON.stringify(data),
+          },
+          () => {}
+        );
       })
       .on("error", (error) => {
         console.log(error);
@@ -29,7 +37,7 @@ export const importFileParser = async (request: any) => {
   });
 
   let result = await streamEnd;
-  
+
   try {
     await s3
       .copyObject({

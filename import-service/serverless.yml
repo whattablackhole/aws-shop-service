@@ -17,6 +17,10 @@ provider:
         - "s3:*"
       Resource:
         - "arn:aws:s3:::wbh-imports/*"
+    - Effect: "Allow"
+      Action:
+        - "sqs:*"
+      Resource: "*"
 functions:
   getProductsList:
     handler: handler.importProductsFile
